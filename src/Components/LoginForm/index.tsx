@@ -19,6 +19,7 @@ export default function LoginForm() {
         await Auth.completeNewPassword(user, password);
         await Auth.signIn(email, password);
       }
+
       setUser(user);
     } catch (error) {
       error && toast.error("username and password invalid");

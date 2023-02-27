@@ -1,7 +1,5 @@
 import { Button, Grid, TextField, Typography } from "@mui/material";
-import { Auth } from "aws-amplify";
 import { useEffect, useState } from "react";
-import { useGlobalUserContext } from "../../context";
 import TodoList from "../TodoList";
 import toast, { Toaster } from "react-hot-toast";
 import { TodoInterface } from "../../lib/types";
@@ -10,15 +8,11 @@ import { TODOS_API, TODO_API } from "../../constants/constants";
 export default function FeedbackForm() {
   const [todo, setTodo] = useState<string>("");
   const [todos, setTodos] = useState<TodoInterface[] | undefined>([]);
-  const { user, setUser } = useGlobalUserContext();
-  const [token, setToken] = useState<string | undefined>("");
 
   useEffect(() => {
-    if (user?.signInUserSession) {
-      setToken(user.signInUserSession.idToken.jwtToken);
-      getTodos();
-    }
-  }, [user, token]);
+    getTodos();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const errorMessage = () => {
     toast.error("Something went wrong, please try again later");
@@ -32,80 +26,70 @@ export default function FeedbackForm() {
   };
 
   const getTodos = () => {
-    token &&
-      fetch(TODOS_API, {
-        method: "GET",
-        headers: {
-          Authorization: token,
-        },
-      })
-        .then((res) => res.json())
-        .then((data) => setTodos(data.Items))
-        .catch((err) => err && errorMessage());
+    fetch(TODOS_API, {
+      method: "GET",
+    })
+      .then((res) => res.json())
+      .then((data) => setTodos(data.Items))
+      .catch((err) => err && errorMessage());
   };
 
   const saveTodo = () => {
-    token &&
-      fetch(TODO_API, {
-        method: "POST",
-        headers: {
-          Authorization: token,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          body: todo,
-          done: false,
-        }),
+    fetch(TODO_API, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        body: todo,
+        done: false,
+      }),
+    })
+      .then((res) => res.json())
+      .then((message) => {
+        message === "Todo created" && successMessage(message);
+        getTodos();
       })
-        .then((res) => res.json())
-        .then((message) => {
-          message === "Todo created" && successMessage(message);
-          getTodos();
-        })
-        .catch((err) => err && errorMessage());
+      .catch((err) => err && errorMessage());
   };
 
   const deleteTodo = (id: string, createdAt: string) => {
-    token &&
-      fetch(TODO_API, {
-        method: "DELETE",
-        headers: {
-          Authorization: token,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: id,
-          createdAt: createdAt,
-        }),
+    fetch(TODO_API, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: id,
+        createdAt: createdAt,
+      }),
+    })
+      .then((res) => res.json())
+      .then((message) => {
+        message === "Deleted" ? deleteMessage() : errorMessage();
+        getTodos();
       })
-        .then((res) => res.json())
-        .then((message) => {
-          message === "Deleted" ? deleteMessage() : errorMessage();
-          getTodos();
-        })
-        .catch((err) => err && errorMessage());
+      .catch((err) => err && errorMessage());
   };
 
   const editTodo = (id: string, createdAt: string, editedTodo: string) => {
-    token &&
-      fetch(TODO_API, {
-        method: "PUT",
-        headers: {
-          Authorization: token,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: id,
-          createdAt: createdAt,
-          body: editedTodo,
-        }),
+    fetch(TODO_API, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: id,
+        createdAt: createdAt,
+        body: editedTodo,
+      }),
+    })
+      .then((res) => res.json())
+      .then((message) => {
+        message === "Changed Todo" ? successMessage(message) : errorMessage();
+        getTodos();
       })
-        .then((res) => res.json())
-        .then((message) => {
-          message === "Changed Todo" ? successMessage(message) : errorMessage();
-          getTodos();
-        })
-        .catch((err) => err && errorMessage());
+      .catch((err) => err && errorMessage());
   };
 
   const completeTodo = (
@@ -114,26 +98,24 @@ export default function FeedbackForm() {
     body: string,
     done: boolean
   ) => {
-    token &&
-      fetch(TODO_API, {
-        method: "PUT",
-        headers: {
-          Authorization: token,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: id,
-          createdAt: createdAt,
-          body: body,
-          done: done,
-        }),
+    fetch(TODO_API, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: id,
+        createdAt: createdAt,
+        body: body,
+        done: done,
+      }),
+    })
+      .then((res) => res.json())
+      .then((message) => {
+        message = !"Changed Todo" ? errorMessage() : null;
+        getTodos();
       })
-        .then((res) => res.json())
-        .then((message) => {
-          message = !"Changed Todo" ? errorMessage() : null;
-          getTodos();
-        })
-        .catch((err) => err && errorMessage());
+      .catch((err) => err && errorMessage());
   };
 
   const submit = () => {
@@ -141,24 +123,10 @@ export default function FeedbackForm() {
     setTodo("");
   };
 
-  async function signOut() {
-    try {
-      await Auth.signOut();
-      setUser(null);
-      window.localStorage.setItem("auth", "false");
-      window.location.reload();
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
   return (
     <>
       <Toaster />
       <>
-        <Button onClick={signOut} color={"error"}>
-          Sign Out
-        </Button>
         <Grid
           container
           sx={{
