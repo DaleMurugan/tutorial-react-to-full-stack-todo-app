@@ -18,9 +18,6 @@ export default function FeedbackForm() {
     toast.error("Something went wrong, please try again later");
   };
 
-  const deleteMessage = () => {
-    toast.error("Todo Deleted");
-  };
   const successMessage = (successMessage: string) => {
     toast.success(successMessage);
   };
@@ -30,7 +27,7 @@ export default function FeedbackForm() {
       method: "GET",
     })
       .then((res) => res.json())
-      .then((data) => setTodos(data.Items))
+      .then((data) => setTodos(data))
       .catch((err) => err && errorMessage());
   };
 
@@ -42,77 +39,12 @@ export default function FeedbackForm() {
       },
       body: JSON.stringify({
         body: todo,
-        done: false,
+        date: new Date(),
       }),
     })
       .then((res) => res.json())
       .then((message) => {
         message === "Todo created" && successMessage(message);
-        getTodos();
-      })
-      .catch((err) => err && errorMessage());
-  };
-
-  const deleteTodo = (id: string, createdAt: string) => {
-    fetch(TODO_API, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: id,
-        createdAt: createdAt,
-      }),
-    })
-      .then((res) => res.json())
-      .then((message) => {
-        message === "Deleted" ? deleteMessage() : errorMessage();
-        getTodos();
-      })
-      .catch((err) => err && errorMessage());
-  };
-
-  const editTodo = (id: string, createdAt: string, editedTodo: string) => {
-    fetch(TODO_API, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: id,
-        createdAt: createdAt,
-        body: editedTodo,
-      }),
-    })
-      .then((res) => res.json())
-      .then((message) => {
-        message === "Changed Todo" ? successMessage(message) : errorMessage();
-        getTodos();
-      })
-      .catch((err) => err && errorMessage());
-  };
-
-  const completeTodo = (
-    id: string,
-    createdAt: string,
-    body: string,
-    done: boolean
-  ) => {
-    fetch(TODO_API, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: id,
-        createdAt: createdAt,
-        body: body,
-        done: done,
-      }),
-    })
-      .then((res) => res.json())
-      .then((message) => {
-        message = !"Changed Todo" ? errorMessage() : null;
         getTodos();
       })
       .catch((err) => err && errorMessage());
@@ -165,13 +97,7 @@ export default function FeedbackForm() {
             </Button>
           </Grid>
           <Grid item xs={12} textAlign={"center"}>
-            <TodoList
-              todos={todos}
-              getTodos={getTodos}
-              deleteTodo={deleteTodo}
-              editTodo={editTodo}
-              completeTodo={completeTodo}
-            />
+            <TodoList todos={todos} />
           </Grid>
         </Grid>
       </>
