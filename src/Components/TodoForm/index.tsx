@@ -18,10 +18,6 @@ export default function FeedbackForm() {
     toast.error("Something went wrong, please try again later");
   };
 
-  const successMessage = (successMessage: string) => {
-    toast.success(successMessage);
-  };
-
   const getTodos = () => {
     fetch(TODOS_API, {
       method: "GET",
@@ -31,7 +27,7 @@ export default function FeedbackForm() {
       .catch((err) => err && errorMessage());
   };
 
-  const saveTodo = () => {
+  const createTodo = () => {
     fetch(TODO_API, {
       method: "POST",
       headers: {
@@ -42,16 +38,15 @@ export default function FeedbackForm() {
         date: new Date(),
       }),
     })
-      .then((res) => res.json())
-      .then((message) => {
-        message === "Todo created" && successMessage(message);
-        getTodos();
+      .then((res) => {
+        res.json();
+        toast.success("Todo Created");
       })
       .catch((err) => err && errorMessage());
   };
 
   const submit = () => {
-    saveTodo();
+    createTodo();
     setTodo("");
   };
 
