@@ -5,7 +5,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { TodoInterface } from "../../lib/types";
 import { TODOS_API, TODO_API } from "../../constants/constants";
 
-export default function FeedbackForm() {
+export default function TodoForm() {
   const [todo, setTodo] = useState<string>("");
   const [todos, setTodos] = useState<TodoInterface[] | undefined>([]);
 
