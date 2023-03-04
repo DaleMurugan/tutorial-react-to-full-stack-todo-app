@@ -1,5 +1,4 @@
-import { Grid, TextField, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Grid, Typography } from "@mui/material";
 
 import { TodoInterface } from "../../lib/types";
 
@@ -8,11 +7,6 @@ interface Props {
 }
 
 export default function Todo(props: Props) {
-  const [editedBody, setEditedBody] = useState<string>("");
-  useEffect(() => {
-    props.todo.body && setEditedBody(props.todo.body);
-  }, [props.todo.body]);
-
   return (
     <Grid item xs={12}>
       <>
