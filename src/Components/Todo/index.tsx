@@ -25,7 +25,7 @@ export default function Todo(props: Props) {
               variant="h4"
               sx={{ textDecoration: props.todo.done ? "line-through" : null }}
             >
-              {props.todo.body}
+              {props.todo.todo}
             </Typography>
           </Grid>
         </Grid>

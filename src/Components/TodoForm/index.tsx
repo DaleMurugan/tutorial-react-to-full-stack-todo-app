@@ -34,7 +34,7 @@ export default function TodoForm() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        body: todo,
+        todo: todo,
         date: new Date(),
       }),
     })

@@ -22,7 +22,7 @@ export interface UserContextInterface {
 export interface TodoInterface {
     id?: string 
     createdAt?: string 
-    body?: string 
+    todo?: string 
     done?: boolean
 }
 
