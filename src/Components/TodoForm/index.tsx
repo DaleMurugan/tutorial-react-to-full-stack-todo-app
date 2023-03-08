@@ -41,6 +41,7 @@ export default function TodoForm() {
       .then((res) => {
         res.json();
         toast.success("Todo Created");
+        getTodos();
       })
       .catch((err) => err && errorMessage());
   };
